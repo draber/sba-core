@@ -1,0 +1,114 @@
+{
+	"name": "spelling-bee-assistant",
+	"version": "5.0.0",
+	"description": "Spelling Bee Assistant is an add-on for Spelling Bee, the New York Times’ popular word puzzle",
+	"homepage": "https://github.com/draber/sba-core.git#readme",
+	"author": "Dieter Raber",
+	"license": "GPL-3",
+	"scripts": {
+		"js:once": "rollup -c ./src/config/rollup.js",
+		"js:watch": "rollup -c -w ./src/config/rollup.js",
+		"js:build": "rollup -c ./src/config/rollup.js --config-env=prod",
+		"dev": "node ./src/tools/compile/compile.js -t app -d",
+		"build": "node ./src/tools/compile/compile.js -t app",
+		"watch": "node ./src/tools/compile/compile.js -t app -w -d",
+		"config": "node --no-warnings ./src/modules/configurator"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/draber/sba-core.git"
+	},
+	"bugs": {
+		"url": "https://github.com/draber/sba-core.git/issues"
+	},
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "^21.0.3",
+		"@rollup/plugin-node-resolve": "^13.1.3",
+		"a-nicer-console": "^1.0.2",
+		"acorn-import-assertions": "^1.8.0",
+		"cssnano": "^5.1.7",
+		"fs-extra": "^10.0.1",
+		"minimist": "^1.2.6",
+		"postcss": "^8.4.12",
+		"postcss-cli": "^9.1.0",
+		"postcss-discard-comments": "^5.1.1",
+		"postcss-each": "^1.1.0",
+		"postcss-import": "^14.1.0",
+		"postcss-preset-env": "^7.4.3",
+		"postcss-scss": "^4.0.3",
+		"remove-accents-diacritics": "^1.0.2",
+		"rollup": "^2.70.1",
+		"rollup-plugin-cleanup": "^3.2.1",
+		"rollup-plugin-import-assert": "^2.1.0",
+		"rollup-plugin-string": "^3.0.0",
+		"rollup-plugin-svg": "^2.0.0",
+		"rollup-plugin-terser": "^7.0.2",
+		"terser": "^5.12.1",
+		"yamljs": "^0.3.0"
+	},
+	"dependencies": {
+		"fancy-node": "^1.0.12"
+	},
+	"label": "Spelling Bee Assistant",
+	"title": "Assistant",
+	"url": "https://spelling-bee-assistant.app/",
+	"domain": "spelling-bee-assistant.app",
+	"repo": "draber/draber.github.io.git",
+	"targetUrl": "https://www.nytimes.com/puzzles/spelling-bee",
+	"twitter": "@d_raber",
+	"ns": "sba",
+	"kofi": {
+		"url": "https://ko-fi.com/sbassistant",
+		"text": "Buy me a coffee"
+	},
+	"wrongOrder": {
+		"nyt": "https://www.nytimes.com",
+		"nestedValid": "https://ko-fi.com/sbassistant und noch was",
+		"nestedInvalid": "https://ko-fi.com/sbassistant und noch was"
+	},
+	"tests": {
+		"nyt": "https://www.nytimes.com",
+		"nestedValid": "https://ko-fi.com/sbassistant und noch was",
+		"nestedInvalid": "sba 5.0.0",
+		"nestedValid2": "some string https://ko-fi.com/sbassistant https://ko-fi.com/sbassistant und noch was",
+		"nestedInvalid2": "sba https://ko-fi.com/sbassistant und noch was",
+		"objBefore": {
+			"manifest": "src/templates/extension/manifest.json",
+			"content": "src/templates/extension/content.js",
+			"readme": "src/templates/sba/readme.md"
+		}
+	},
+	"rightOrder": {
+		"nyt": "https://www.nytimes.com",
+		"nestedValid": "https://ko-fi.com/sbassistant und noch was",
+		"nestedInvalid": "https://ko-fi.com/sbassistant und noch was and -  ns1: sba -- ns2: sba --or 5.0.0"
+	},
+	"extension": {
+		"templates": {
+			"manifest": "src/templates/extension/manifest.json",
+			"content": "src/templates/extension/content.js",
+			"readme": "src/templates/sba/readme.md"
+		},
+		"stores": {
+			"chrome": {
+				"url": "https://chrome.google.com/webstore/detail/spelling-bee-assistant/ncejlmlagglodbdmkfmgnadfnbhnjcpg",
+				"objAfter": {
+					"manifest": "src/templates/extension/manifest.json",
+					"content": "src/templates/extension/content.js",
+					"readme": "src/templates/sba/readme.md"
+				},
+				"objAfterWrong": "[object Object] is wrong",
+				"manifest": {
+					"manifest_version": 3,
+					"host_permissions": [
+						"https://www.nytimes.com/*"
+					]
+				}
+			},
+			"opera": {
+				"url": "https://addons.opera.com/en/extensions/details/spelling-bee-assistant/",
+				"manifest": null
+			}
+		}
+	}
+}
