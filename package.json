@@ -8,11 +8,12 @@
   "scripts": {
     "js:once": "rollup -c ./src/config/rollup.js",
     "js:watch": "rollup -c -w ./src/config/rollup.js",
-    "js:build": "rollup -c ./src/config/rollup.js --config-env=prod",
-    "dev": "node ./src/tools/compile/compile.js -t app -d",
-    "build": "node ./src/tools/compile/compile.js -t app",
-    "watch": "node ./src/tools/compile/compile.js -t app -w -d",
-    "config": "node --no-warnings ./src/modules/configurator"
+    "js:build": "npm run css:build && npm run feConf:build && rollup -c ./src/config/rollup.js --config-env=prod",
+    "feConf:once": "node ./src/modules/config-segments/fe-fonfig.js",
+    "feConf:build": "node ./src/modules/config-segments/fe-fonfig.js --env=prod",
+    "css:once": "postcss ./src/css/main.css --config=src/config/postcss --verbose -d ./src/css/build",
+    "css:watch": "postcss ./src/css/main.css --config=src/config/postcss -d ./src/css/build -w",
+    "css:build": "postcss ./src/css/main.css --config=src/config/postcss -d ./src/css/build --env=prod"
   },
   "repository": {
     "type": "git",
@@ -32,7 +33,6 @@
     "postcss": "^8.4.12",
     "postcss-cli": "^9.1.0",
     "postcss-discard-comments": "^5.1.1",
-    "postcss-each": "^1.1.0",
     "postcss-import": "^14.1.0",
     "postcss-preset-env": "^7.4.3",
     "postcss-scss": "^4.0.3",

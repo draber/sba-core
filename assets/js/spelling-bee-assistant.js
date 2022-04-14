@@ -68,107 +68,209 @@
 	    return !(structuredClone instanceof Function) ? JSON.parse(JSON.stringify(obj)) : structuredClone(obj);
 	};
 
-	const _get = (keyStr, obj) => {
-	    const keys = keyStr.toString().split('.');
-	    return keys.reduce(
-	        (current, token) => {
-	            return current?.[token]
-	        },
-	        obj
-	    )
+	const _isPlainObject = (value) => {
+	  return !!(
+	    value &&
+	    typeof value === "object" &&
+	    Object.getPrototypeOf(value) === Object.prototype
+	  );
 	};
-	const _getObjSegment = (keys, current) => {
-	    for (let token of keys) {
-	        if (!current[token]) {
-	            current[token] = {};
-	        }
-	        if (Object.getPrototypeOf(current) !== Object.prototype) {
-	            throw (`${token} is not of the type Object`);
-	        }
-	        current = current[token];
+	const _isCollection = (value) => {
+	  return _isPlainObject(value) || Array.isArray(value);
+	};
+	const _keysToDotNotation = (obj, dotArr = [], propStr = "") => {
+	  if (typeof obj === "undefined" || obj === null) {
+	    return dotArr;
+	  }
+	  if (Array.isArray(obj)) {
+	    obj = {
+	      ...obj,
+	    };
+	  }
+	  Object.entries(obj).forEach(([key, val]) => {
+	    const nestedPropStr = propStr + (propStr ? "." : "") + key;
+	    if (_isCollection(val)) {
+	      _keysToDotNotation(val, dotArr, nestedPropStr);
+	    } else {
+	      dotArr.push(nestedPropStr);
 	    }
-	    return current;
+	  });
+	  return dotArr;
+	};
+	const _get = (obj, keyStr) => {
+	  const keys = keyStr.toString().split(".");
+	  return keys.reduce((current, token) => {
+	    return current?.[token];
+	  }, obj);
+	};
+	const _update = (obj, keyStr, value) => {
+	  const keys = keyStr.toString().split(".");
+	  const last = keys.pop();
+	  for (let token of keys) {
+	    if (!obj[token]) {
+	      obj[token] = {};
+	    }
+	    if (!_isPlainObject(obj)) {
+	      throw `${token} is not of the type Object`;
+	    }
+	    obj = obj[token];
+	  }
+	  if (typeof value !== "undefined") {
+	    obj[last] = value;
+	  } else {
+	    delete obj[last];
+	  }
+	  return obj;
+	};
+	const _getTplMatchData = (tree) => {
+	  let objStr = tree.toJson();
+	  let matchPaths = [...objStr.matchAll(tree.tplRe)].map((e) => e.groups.path);
+	  matchPaths = Array.from(new Set(matchPaths));
+	  let matchData = {};
+	  matchPaths.forEach((entry) => {
+	    const data = tree.get(entry);
+	    if (["string", "number"].includes(typeof data) || _isCollection(data)) {
+	      matchData[`{{${entry}}}`] = data;
+	    }
+	  });
+	  for (let [placeholder, entryData] of Object.entries(matchData)) {
+	    if (_isCollection(entryData)) {
+	      for (let path of _keysToDotNotation(entryData)) {
+	        const value = _get(entryData, path);
+	        if (["string", "number"].includes(typeof value)) {
+	          _update(
+	            entryData,
+	            path,
+	            value.replace(tree.tplRe, (full, capture) => {
+	              return typeof matchData[capture] !== "undefined"
+	                ? matchData[capture]
+	                : capture;
+	            })
+	          );
+	        }
+	      }
+	      matchData[placeholder] = entryData;
+	    } else {
+	      matchData[placeholder] = entryData.replace(
+	        tree.tplRe,
+	        (full, capture) => {
+	          return typeof matchData[capture] !== "undefined"
+	            ? matchData[capture]
+	            : capture;
+	        }
+	      );
+	    }
+	  }
+	  return matchData;
 	};
 	class Tree {
-	    get length() {
-	        return this.keys().length;
+	  get length() {
+	    return this.keys().length;
+	  }
+	  flush() {
+	    this.obj = {};
+	    this.save();
+	  }
+	  save() {
+	    return this.lsKey ? localStorage.setItem(this.lsKey, this.toJson()) : null;
+	  }
+	  set(keyStr, value) {
+	    _update(this.obj, keyStr, value);
+	    this.save();
+	    return this;
+	  }
+	  unset(keyStr) {
+	    _update(this.obj, keyStr);
+	    this.save();
+	    return this;
+	  }
+	  get(key) {
+	    return _get(this.obj, key);
+	  }
+	  getClone(key) {
+	    return deepClone(this.get(key));
+	  }
+	  has(key) {
+	    return typeof this.get(key) !== "undefined";
+	  }
+	  where(searchKey, cmpFn, expected = null) {
+	    return [searchKey, cmpFn, expected];
+	  }
+	  object(...conditions) {
+	    conditions = conditions.filter((e) => Array.isArray(e));
+	    if (!conditions.length) {
+	      return this.obj;
 	    }
-	    flush() {
-	        this.obj = {};
-	        this.save();
-	    }
-	    save() {
-	        return this.lsKey ? localStorage.setItem(this.lsKey, this.toJson()) : null;
-	    }
-	    set(keyStr, value) {
-	        const keys = keyStr.toString().split('.');
-	        const last = keys.pop();
-	        _getObjSegment(keys, this.obj)[last] = value;
-	        this.save();
-	        return this;
-	    }
-	    unset(keyStr) {
-	        const keys = keyStr.toString().split('.');
-	        const last = keys.pop();
-	        delete _getObjSegment(keys, this.obj)[last];
-	        this.save();
-	        return this;
-	    }
-	    get(key) {
-	        return _get(key, this.obj);
-	    }
-	    getClone(key) {
-	        return deepClone(this.get(key))
-	    }
-	    has(key) {
-	        return typeof this.get(key) !== 'undefined';
-	    }
-	    where(searchKey, cmpFn, expected = null) {
-	        return [searchKey, cmpFn, expected];
-	    }
-	    object(...conditions) {
-	        conditions = conditions.filter(e => Array.isArray(e));
-	        if (!conditions.length) {
-	            return this.obj;
+	    const result = {};
+	    for (let [key, entry] of Object.entries(this.obj)) {
+	      conditions.forEach((condition) => {
+	        const comperator = _get(this.obj, `${key}.${condition[0]}`);
+	        const expected = condition[2];
+	        const fn = getCmpFn(condition[1]);
+	        if (fn(comperator, expected)) {
+	          result[key] = entry;
 	        }
-	        const result = {};
-	        for (let [key, entry] of Object.entries(this.obj)) {
-	            conditions.forEach(condition => {
-	                const comperator = _get(`${key}.${condition[0]}`, this.obj);
-	                const expected = condition[2];
-	                const fn = getCmpFn(condition[1]);
-	                if (fn(comperator, expected)) {
-	                    result[key] = entry;
-	                }
-	            });
-	        }
-	        return result;
+	      });
 	    }
-	    entries(...conditions) {
-	        return Object.entries(this.object.apply(this, conditions));
+	    return result;
+	  }
+	  entries(...conditions) {
+	    return Object.entries(this.object.apply(this, conditions));
+	  }
+	  values(...conditions) {
+	    return Object.values(this.object.apply(this, conditions));
+	  }
+	  keys(...conditions) {
+	    return Object.keys(this.object.apply(this, conditions));
+	  }
+	  remove(...keys) {
+	    keys.forEach((key) => {
+	      delete this.obj[key];
+	    });
+	    this.save();
+	  }
+	  resolveVars() {
+	    const matchData = _getTplMatchData(this);
+	    for (let path of _keysToDotNotation(this.obj)) {
+	      const value = this.get(path);
+	      if (matchData[value] && _isPlainObject(matchData[value])) {
+	        this.set(path, matchData[value]);
+	        continue;
+	      }
+	      if (
+	        !["string", "number"].includes(typeof value) ||
+	        !this.tplRe.test(value.toString())
+	      ) {
+	        continue;
+	      }
+	      this.set(
+	        path,
+	        value.replace(this.tplRe, (full, capture) => {
+	          if (typeof matchData[capture] === "undefined") {
+	            return capture;
+	          }
+	          if (_isCollection(matchData[capture]) && value !== full) {
+	            console.error(
+	              `Incompatible types: '${path}' contains '${full}' which resolves to an object or array`
+	            );
+	          }
+	          return typeof matchData[capture] !== "undefined"
+	            ? matchData[capture]
+	            : capture;
+	        })
+	      );
 	    }
-	    values(...conditions) {
-	        return Object.values(this.object.apply(this, conditions));
-	    }
-	    keys(...conditions) {
-	        return Object.keys(this.object.apply(this, conditions));
-	    }
-	    remove(...keys) {
-	        keys.forEach(key => {
-	            delete this.obj[key];
-	        });
-	        this.save();
-	    }
-	    toJson(pretty = false) {
-	        return JSON.stringify(this.obj, null, (pretty ? '\t' : null));
-	    }
-	    constructor({
-	        data = {},
-	        lsKey = false
-	    } = {}) {
-	        this.obj = data;
-	        this.lsKey = lsKey;
-	    }
+	    return this;
+	  }
+	  toJson(pretty = false) {
+	    return JSON.stringify(this.obj, null, pretty ? "\t" : null);
+	  }
+	  constructor({ data = {}, lsKey = false } = {}) {
+	    this.obj = data;
+	    this.lsKey = lsKey;
+	    this.tplRe = /(?<full>{{(?<path>[^}]+)}})/g;
+	    this.resolveVars();
+	  }
 	}
 
 	const confStore = new Tree({

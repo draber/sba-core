@@ -4,61 +4,45 @@ title: Assistant
 url: https://{{name}}.app/
 domain: '{{name}}.app'
 repo: draber/draber.github.io.git
-targetUrl: https://www.nytimes.com/puzzles/spelling-bee
+targetUrl: '{{nyt}}/puzzles/spelling-bee'
 twitter: "@d_raber"
 ns: sba
+nyt: https://www.nytimes.com
 kofi:
   url: https://ko-fi.com/sbassistant
   text: Buy me a coffee
-# extensions:
-#   &ext-common
-
-wrongOrder:
-  nyt: '{{tests.nyt}}'
-  nestedValid: '{{tests.nestedValid}}'
-  nestedInvalid: '{{tests.nestedValid}}'
-tests:
-  nyt: https://www.nytimes.com
-  nestedValid: '{{kofi.url}} und noch was'
-  nestedInvalid: '{{ns}} {{version}}'
-  
-  nestedValid2: 'some string {{kofi.url}} {{tests.nestedValid}}'
-  nestedInvalid2: '{{ns}} {{tests.nestedValid}}'
-  objBefore: '{{extension.templates}}'
-rightOrder:
-  nyt: '{{tests.nyt}}'
-  nestedValid: '{{tests.nestedValid}}'
-  nestedInvalid: '{{tests.nestedValid}} and -  ns1: {{ns}} -- ns2: {{ns}} --or {{version}}'
-  
+rollup:
+  input: src/app/main.js
+  format: iife
+  uncompressed: assets/js/{{name}}.js
+  compressed: assets/js/{{name}}.min.js
+ 
 extension:
   templates:
     manifest: src/templates/extension/manifest.json
     content: src/templates/extension/content.js
     readme: src/templates/{{ns}}/readme.md
-  # assets: src/templates/extension/assets
-  # output: src/extensions {{tests.nestedInvalid}}
-  # sba: '{{name}}.js'
-  # sba-min: '{{name}}.min.js'
+    assets: src/templates/extension/assets
+    sba: '{{name}}.js'
+    sba-min: '{{name}}.min.js'
   stores:
     chrome:
       url: https://chrome.google.com/webstore/detail/{{name}}/ncejlmlagglodbdmkfmgnadfnbhnjcpg
-      objAfter: '{{extension.templates}}'
-      objAfterWrong: '{{extension.templates}} is wrong'
       manifest:
         manifest_version: 3
         host_permissions:
-          - '{{tests.nyt}}/*'
+          - '{{nyt}}/*'
         # web_accessible_resources:
         #   - resources:
         #       - '{{name}}.js'
         #     matches:
-        #       - '{{tests.nyt}}/*'
+        #       - '{{nyt}}/*'
     # firefox:
     #   url: https://addons.mozilla.org/en-US/firefox/addon/{{name}}/
     #   enforce_unminified: true
     #   manifest:
     #     # permissions:
-    #     #   - '{{tests.nyt}}/*'
+    #     #   - '{{nyt}}/*'
     #     browser_specific_settings:
     #       gecko:
     #         id: '{4474f7b5-4da5-4332-8847-074f35456496}'
@@ -67,22 +51,19 @@ extension:
     #   url: https://microsoftedge.microsoft.com/addons/detail/{{name}}/doeniefjeejkkdfnakoflmjlmfipejin
     #   manifest:
     #     # permissions:
-    #     #   - '{{tests.nyt}}/*'
+    #     #   - '{{nyt}}/*'
     opera:
       url: https://addons.opera.com/en/extensions/details/{{name}}/
       manifest:
         # permissions:
-        #   - '{{tests.nyt}}/*'
-# js:
-#   input: src/app/main.js
-#   plain: assets/js/{{name}}.js
-#   format: iife
-# scss:
-#   app: src/scss/app.scss
-#   site: src/scss/site.scss
-# bookmarklet:
-#   remote: https://{{name}}.app/assets/js/{{name}}.min.js
-#   local: assets/js/{{name}}.min.js
-#   template: src/templates/bookmarklet/template.js
-# css:
-#   app: src/css/app.css
+        #   - '{{nyt}}/*'
+
+scss:
+  app: src/scss/app.scss
+  site: src/scss/site.scss
+bookmarklet:
+  remote: https://{{name}}.app/assets/js/{{name}}.min.js
+  local: assets/js/{{name}}.min.js
+  template: src/templates/bookmarklet/template.js
+css:
+  app: src/css/app.css

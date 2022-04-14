@@ -1,0 +1,34 @@
+[data-sba-theme] {
+  --dhue: 0;
+  --dsat: 0%;
+  --link-hue: 206;
+  --highlight-text-color: hsl(0 0% 0%);
+}
+[data-sba-theme="light"] {
+  --highlight-bg-color: hsl(52 93% 55%);
+  --text-color: hsl(0 0% 0%);
+  --body-bg-color: hsl(0 0% 100%);
+  --modal-bg-color: hsl(0 0% 100% / 0.85);
+  --border-color: hsl(0 0% 86%);
+  --area-bg-color: hsl(0 0% 90%);
+  --invalid-color: hsl(0 0% 68%);
+  --menu-hover-color: hsl(0 0% 96%);
+  --head-row-bg-color: hsl(0 0% 96%);
+  --link-color: hsl(var(--link-hue) 45% / 38%);
+  --link-visited-color: hsl(var(--link-hue) 45% / 53%);
+  --link-hover-color: hsl(var(--link-hue) 45% / 53%);
+}
+[data-sba-theme="dark"] {
+  --highlight-bg-color: hsl(49 96% 50%);
+  --text-color: hsl(var(--dhue) var(--dsat) 85%);
+  --body-bg-color: hsl(var(--dhue) var(--dsat) 7%);
+  --modal-bg-color: hsl(var(--dhue) var(--dsat) 7% / 0.85);
+  --border-color: hsl(var(--dhue) var(--dsat) 20%);
+  --area-bg-color: hsl(var(--dhue) var(--dsat) 22%);
+  --invalid-color: hsl(var(--dhue) var(--dsat) 50%);
+  --menu-hover-color: hsl(var(--dhue) var(--dsat) 22%);
+  --head-row-bg-color: hsl(var(--dhue) var(--dsat) 13%);
+  --link-color: hsl(var(--link-hue) 90% 64%);
+  --link-visited-color: hsl(var(--link-hue) 90% 76%);
+  --link-hover-color: hsl(var(--link-hue) 90% 76%);
+}
