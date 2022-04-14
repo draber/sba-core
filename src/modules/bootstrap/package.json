@@ -1,0 +1,6 @@
+{
+    "name": "bootstrap",
+    "version": "1.0.0",
+    "main": "bootstrap.js",
+    "type": "module"
+}

@@ -1,12 +1,1 @@
-{
-	"version": "5.0.0",
-	"label": "Spelling Bee Assistant",
-	"title": "Assistant",
-	"url": "https://spelling-bee-assistant.app/",
-	"ns": "sba",
-	"kofi": {
-		"url": "https://ko-fi.com/sbassistant",
-		"text": "Buy me a coffee"
-	},
-	"targetUrl": "https://www.nytimes.com/puzzles/spelling-bee"
-}
+{"version":"5.0.0","label":"Spelling Bee Assistant","title":"Assistant","url":"https://spelling-bee-assistant.app/","ns":"sba","kofi":{"url":"https://ko-fi.com/sbassistant","text":"Buy me a coffee"},"targetUrl":"https://www.nytimes.com/puzzles/spelling-bee"}

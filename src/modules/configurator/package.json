@@ -1,6 +1,0 @@
-{
-    "name": "configurator",
-    "version": "1.0.0",
-    "main": "configurator.js",
-    "type": "module"
-}

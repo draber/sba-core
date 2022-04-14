@@ -7,7 +7,7 @@
 import {
     prefix
 } from '../modules/string.js';
-import css from '../../css/app.css';
+import css from '../../css/build/main.css';
 import Plugin from '../modules/plugin.js';
 import fn from 'fancy-node';
 

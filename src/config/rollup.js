@@ -1,52 +1,41 @@
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import {
-    importAssertionsPlugin
-} from 'rollup-plugin-import-assert';
-import {
-    importAssertions
-} from 'acorn-import-assertions';
+import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import { importAssertionsPlugin } from "rollup-plugin-import-assert";
+import { importAssertions } from "acorn-import-assertions";
 
-import cleanup from 'rollup-plugin-cleanup';
-import {
-    terser
-} from 'rollup-plugin-terser';
-import svg from 'rollup-plugin-svg';
-import {
-    string
-} from 'rollup-plugin-string';
-import minimist from 'minimist';
-const args = minimist(process.argv.slice(2));
+import cleanup from "rollup-plugin-cleanup";
+import { terser } from "rollup-plugin-terser";
+import svg from "rollup-plugin-svg";
+import { string } from "rollup-plugin-string";
 
-const env = args.env || args['config-env'] || 'dev';
-// import {
-//     config,
-//     env
-// } from '../js/builder/bootstrap.js';
-//import feConfig from '../config/segments/frontend.json'  assert { type: 'json' };
+import { config, env } from "../modules/bootstrap/bootstrap.js";
 
+let outputFile = config.get("rollup.uncompressed");
 
 const plugins = [
-    resolve(),
-    importAssertionsPlugin(),
-    commonjs(),
-    cleanup(),
-    string({
-        include: '**/*.css'
-    }),
-    svg()
-]
+  resolve(),
+  importAssertionsPlugin(),
+  commonjs(),
+  cleanup(),
+  string({
+    include: "**/*.css",
+  }),
+  svg(),
+];
 
-if (env === 'prod') {
-    plugins.push(terser());
+if (env === "prod") {
+  plugins.push(terser());
+  outputFile = config.get("rollup.compressed");
 }
 
-export default [{
-    input: 'src/app/main.js',
+export default [
+  {
+    input: config.get("rollup.input"),
     output: {
-        file: 'assets/js/spelling-bee-assistant.js',
-        format: 'iife'
+      file: outputFile,
+      format: config.get("rollup.format"),
     },
     acornInjectPlugins: [importAssertions],
-    plugins
-}];
+    plugins,
+  },
+];
